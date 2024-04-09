@@ -18,6 +18,6 @@ func NewPlayerRepository(db *mongo.Client) PlayerRepositoryService {
 	return &playerRepository{db}
 }
 
-func (r *playerRepository) playerRepository(pctx context.Context) *mongo.Database {
+func (r *playerRepository) playerDbConn(pctx context.Context) *mongo.Database {
 	return r.db.Database("player_db")
 }

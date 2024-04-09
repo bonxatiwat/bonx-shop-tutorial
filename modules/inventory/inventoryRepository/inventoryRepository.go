@@ -18,6 +18,6 @@ func NewInventoryService(db *mongo.Client) InventoryRepositoryService {
 	return &inventoryRepository{db}
 }
 
-func (r *inventoryRepository) InventoryDbConn(ptcx context.Context) *mongo.Database {
+func (r *inventoryRepository) inventoryDbConn(ptcx context.Context) *mongo.Database {
 	return r.db.Database("inventory_db")
 }
