@@ -7,6 +7,7 @@ import (
 
 	"github.com/bonxatiwat/bonx-shop-tutorial/config"
 	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/database"
+	"github.com/bonxatiwat/bonx-shop-tutorial/server"
 )
 
 func main() {
@@ -26,5 +27,6 @@ func main() {
 	db := database.DbConn(ctx, &cfg)
 	defer db.Disconnect(ctx)
 
-	log.Println(db)
+	// Start Server
+	server.Start(ctx, &cfg, db)
 }
