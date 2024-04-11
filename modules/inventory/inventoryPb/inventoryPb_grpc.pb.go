@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type InventoryGrpcServiceClient interface {
-	IsAvailableToSell(ctx context.Context, in *IsAvaliableToSellReq, opts ...grpc.CallOption) (*IsAvaliableToSellRes, error)
+	IsAvaliableToSell(ctx context.Context, in *IsAvaliableToSellReq, opts ...grpc.CallOption) (*IsAvaliableToSellRes, error)
 }
 
 type inventoryGrpcServiceClient struct {
@@ -33,9 +33,9 @@ func NewInventoryGrpcServiceClient(cc grpc.ClientConnInterface) InventoryGrpcSer
 	return &inventoryGrpcServiceClient{cc}
 }
 
-func (c *inventoryGrpcServiceClient) IsAvailableToSell(ctx context.Context, in *IsAvaliableToSellReq, opts ...grpc.CallOption) (*IsAvaliableToSellRes, error) {
+func (c *inventoryGrpcServiceClient) IsAvaliableToSell(ctx context.Context, in *IsAvaliableToSellReq, opts ...grpc.CallOption) (*IsAvaliableToSellRes, error) {
 	out := new(IsAvaliableToSellRes)
-	err := c.cc.Invoke(ctx, "/InventoryGrpcService/IsAvailableToSell", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/InventoryGrpcService/IsAvaliableToSell", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *inventoryGrpcServiceClient) IsAvailableToSell(ctx context.Context, in *
 // All implementations must embed UnimplementedInventoryGrpcServiceServer
 // for forward compatibility
 type InventoryGrpcServiceServer interface {
-	IsAvailableToSell(context.Context, *IsAvaliableToSellReq) (*IsAvaliableToSellRes, error)
+	IsAvaliableToSell(context.Context, *IsAvaliableToSellReq) (*IsAvaliableToSellRes, error)
 	mustEmbedUnimplementedInventoryGrpcServiceServer()
 }
 
@@ -54,8 +54,8 @@ type InventoryGrpcServiceServer interface {
 type UnimplementedInventoryGrpcServiceServer struct {
 }
 
-func (UnimplementedInventoryGrpcServiceServer) IsAvailableToSell(context.Context, *IsAvaliableToSellReq) (*IsAvaliableToSellRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsAvailableToSell not implemented")
+func (UnimplementedInventoryGrpcServiceServer) IsAvaliableToSell(context.Context, *IsAvaliableToSellReq) (*IsAvaliableToSellRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAvaliableToSell not implemented")
 }
 func (UnimplementedInventoryGrpcServiceServer) mustEmbedUnimplementedInventoryGrpcServiceServer() {}
 
@@ -70,20 +70,20 @@ func RegisterInventoryGrpcServiceServer(s grpc.ServiceRegistrar, srv InventoryGr
 	s.RegisterService(&InventoryGrpcService_ServiceDesc, srv)
 }
 
-func _InventoryGrpcService_IsAvailableToSell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _InventoryGrpcService_IsAvaliableToSell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IsAvaliableToSellReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(InventoryGrpcServiceServer).IsAvailableToSell(ctx, in)
+		return srv.(InventoryGrpcServiceServer).IsAvaliableToSell(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/InventoryGrpcService/IsAvailableToSell",
+		FullMethod: "/InventoryGrpcService/IsAvaliableToSell",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InventoryGrpcServiceServer).IsAvailableToSell(ctx, req.(*IsAvaliableToSellReq))
+		return srv.(InventoryGrpcServiceServer).IsAvaliableToSell(ctx, req.(*IsAvaliableToSellReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +96,8 @@ var InventoryGrpcService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*InventoryGrpcServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "IsAvailableToSell",
-			Handler:    _InventoryGrpcService_IsAvailableToSell_Handler,
+			MethodName: "IsAvaliableToSell",
+			Handler:    _InventoryGrpcService_IsAvaliableToSell_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -16,5 +16,5 @@ message IsAvaliableToSellRes {
 
 // Methods
 service InventoryGrpcService {
-  rpc IsAvailableToSell(IsAvaliableToSellReq) returns (IsAvaliableToSellRes);
+  rpc IsAvaliableToSell(IsAvaliableToSellReq) returns (IsAvaliableToSellRes);
 }
