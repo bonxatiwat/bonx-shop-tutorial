@@ -1,6 +1,11 @@
 package itemHandler
 
-import "github.com/bonxatiwat/bonx-shop-tutorial/modules/item/itemUsecase"
+import (
+	"context"
+
+	itemPb "github.com/bonxatiwat/bonx-shop-tutorial/modules/item/itemPb"
+	"github.com/bonxatiwat/bonx-shop-tutorial/modules/item/itemUsecase"
+)
 
 type (
 	itemGrpcHandler struct {
@@ -9,5 +14,9 @@ type (
 )
 
 func NewItemGrpcHandler(itemUsecase itemUsecase.ItemUsecaseService) *itemGrpcHandler {
-	return &itemGrpcHandler{itemUsecase}
+	return &itemGrpcHandler{itemUsecase: itemUsecase}
+}
+
+func (g *itemGrpcHandler) FindItemsInIds(ctx context.Context, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error) {
+	return nil, nil
 }
