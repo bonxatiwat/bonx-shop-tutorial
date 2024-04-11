@@ -4,7 +4,7 @@ syntax = "proto3";
 // Package name
 option go_package = "github.com/bonxatiwat/bonx-shop-tutorial";
 
-// Structores
+// Structures
 message PlayerProfile {
   string id = 1;
   string email = 2;
