@@ -1,0 +1,20 @@
+// Version
+syntax = "proto3";
+
+// Package name
+option go_package = "github.com/bonxatiwat/bonx-shop-tutorial";
+
+// Structures
+message IsAvaliableToSellReq {
+  string playerId = 1;
+  string itemId = 2;
+}
+
+message IsAvaliableToSellRes {
+  bool isAvaliable = 1;
+}
+
+// Methods
+service InventoryGrpcService {
+  rpc IsAvailableToSell(IsAvaliableToSellReq) returns (IsAvaliableToSellRes);
+}
