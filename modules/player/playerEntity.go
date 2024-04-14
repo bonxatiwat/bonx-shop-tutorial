@@ -26,7 +26,7 @@ type (
 		Id        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 		Email     string             `json:"email" bson:"email"`
 		Username  string             `json:"username" bson:"username"`
-		CreateAt  time.Time          `json:"created_at" bson:"created_at"`
+		CreatedAt time.Time          `json:"created_at" bson:"created_at"`
 		UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
 	}
 
