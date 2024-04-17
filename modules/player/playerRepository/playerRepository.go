@@ -128,27 +128,6 @@ func (r *playerRepository) GetPlayerSavingAccount(pctx context.Context, playerId
 	db := r.playerDbConn(ctx)
 	col := db.Collection("player_transactions")
 
-	// filter := bson.A{
-	// 	bson.D{{Key: "$match", Value: bson.D{{Key: "player_id", Value: "player:661b7dff523a48d559ba2ee9"}}}},
-	// 	bson.D{
-	// 		{Key: "$group",
-	// 			Value: bson.D{
-	// 				{Key: "_id", Value: "$player_id"},
-	// 				{Key: "balance", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
-	// 			},
-	// 		},
-	// 	},
-	// 	bson.D{
-	// 		{Key: "$project",
-	// 			Value: bson.D{
-	// 				{Key: "player_id", Value: "$_id"},
-	// 				{Key: "_id", Value: 0},
-	// 				{Key: "balance", Value: 1},
-	// 			},
-	// 		},
-	// 	},
-	// }
-
 	filter := bson.A{
 		bson.D{{"$match", bson.D{{"player_id", playerId}}}},
 		bson.D{
