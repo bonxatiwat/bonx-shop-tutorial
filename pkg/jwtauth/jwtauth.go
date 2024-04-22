@@ -1,6 +1,11 @@
 package jwtauth
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"math"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type (
 	AuthFactory interface {
@@ -31,4 +36,36 @@ func (a *authConcrete) SignToken() string {
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, a.Claims)
 	ss, _ := token.SignedString(a.Secret)
 	return ss
+}
+
+func now() time.Time {
+	return time.Now()
+}
+
+// secound unit
+func jwtTimeDurationCal(t int64) *jwt.NumericDate {
+	return jwt.NewNumericDate(time.Now().Add((time.Duration(t * int64(math.Pow10(9))))))
+}
+
+func jwtTimeRepeatAdapter(t int64) *jwt.NumericDate {
+	return jwt.NewNumericDate(time.Unix(t, 0))
+}
+
+func NewAccessToken(secret string, expriedAt int64, claims *Claims) AuthFactory {
+	return &accessToken{
+		authConcrete: &authConcrete{
+			Secret: []byte(secret),
+			Claims: &AuthMapClaims{
+				Claims: claims,
+				RegisteredClaims: jwt.RegisteredClaims{
+					Issuer:    "bonxshop.com",
+					Subject:   "access-token",
+					Audience:  []string{"bonxshop.com"},
+					ExpiresAt: jwtTimeDurationCal(expriedAt),
+					NotBefore: jwt.NewNumericDate(now()),
+					IssuedAt:  jwt.NewNumericDate(now()),
+				},
+			},
+		},
+	}
 }
