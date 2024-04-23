@@ -71,7 +71,7 @@ func NewAccessToken(secret string, expriedAt int64, claims *Claims) AuthFactory 
 }
 
 func NewRefreshToken(secret string, expiredAt int64, claims *Claims) AuthFactory {
-	return &accessToken{
+	return &refreshToken{
 		authConcrete: &authConcrete{
 			Secret: []byte(secret),
 			Claims: &AuthMapClaims{
@@ -108,4 +108,23 @@ func ReloadToken(secret string, expiredAt int64, claims *Claims) string {
 	}
 
 	return obj.SignToken()
+}
+
+func NewApiKey(secret string, expiredAt int64, claims *Claims) AuthFactory {
+	return &apiKey{
+		authConcrete: &authConcrete{
+			Secret: []byte(secret),
+			Claims: &AuthMapClaims{
+				Claims: claims,
+				RegisteredClaims: jwt.RegisteredClaims{
+					Issuer:    "bonxshop.com",
+					Subject:   "api-key",
+					Audience:  []string{"bonxshop.com"},
+					ExpiresAt: jwtTimeDurationCal(31536000),
+					NotBefore: jwt.NewNumericDate(now()),
+					IssuedAt:  jwt.NewNumericDate(now()),
+				},
+			},
+		},
+	}
 }
