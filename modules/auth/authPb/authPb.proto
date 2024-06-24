@@ -21,6 +21,6 @@ message RolesCountRes {
 
 // Methods
 service AuthGrpcService {
-  rpc CredentialSearch(AccessTokenSearchReq) returns (AccessTokenSearchRes);
+  rpc AccessTokenSearch(AccessTokenSearchReq) returns (AccessTokenSearchRes);
   rpc RolesCount(RolesCountReq) returns (RolesCountRes);
 }
