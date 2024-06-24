@@ -8,7 +8,7 @@ option go_package = "github.com/bonxatiwat/bonx-shop-tutorial";
 message PlayerProfile {
   string id = 1;
   string email = 2;
-  string usename = 3;
+  string username = 3;
   int32 roleCode = 4;
   string created_at = 5;
   string updated_at = 6;

@@ -1,11 +1,15 @@
 package jwtauth
 
 import (
+	"context"
 	"errors"
+	"log"
 	"math"
+	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"google.golang.org/grpc/metadata"
 )
 
 type (
@@ -14,7 +18,7 @@ type (
 	}
 
 	Claims struct {
-		Id       string `json:"_id"`
+		PlayerId string `json:"player_id"`
 		RoleCode int    `json:"role_code"`
 	}
 
@@ -34,8 +38,9 @@ type (
 )
 
 func (a *authConcrete) SignToken() string {
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, a.Claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, a.Claims)
 	ss, _ := token.SignedString(a.Secret)
+	log.Printf("Generated token: %s", ss) // เพิ่ม logging
 	return ss
 }
 
@@ -52,7 +57,7 @@ func jwtTimeRepeatAdapter(t int64) *jwt.NumericDate {
 	return jwt.NewNumericDate(time.Unix(t, 0))
 }
 
-func NewAccessToken(secret string, expriedAt int64, claims *Claims) AuthFactory {
+func NewAccessToken(secret string, expiredAt int64, claims *Claims) AuthFactory {
 	return &accessToken{
 		authConcrete: &authConcrete{
 			Secret: []byte(secret),
@@ -62,7 +67,7 @@ func NewAccessToken(secret string, expriedAt int64, claims *Claims) AuthFactory 
 					Issuer:    "bonxshop.com",
 					Subject:   "access-token",
 					Audience:  []string{"bonxshop.com"},
-					ExpiresAt: jwtTimeDurationCal(expriedAt),
+					ExpiresAt: jwtTimeDurationCal(expiredAt),
 					NotBefore: jwt.NewNumericDate(now()),
 					IssuedAt:  jwt.NewNumericDate(now()),
 				},
@@ -111,12 +116,12 @@ func ReloadToken(secret string, expiredAt int64, claims *Claims) string {
 	return obj.SignToken()
 }
 
-func NewApiKey(secret string, expiredAt int64, claims *Claims) AuthFactory {
+func NewApiKey(secret string) AuthFactory {
 	return &apiKey{
 		authConcrete: &authConcrete{
 			Secret: []byte(secret),
 			Claims: &AuthMapClaims{
-				Claims: claims,
+				Claims: &Claims{},
 				RegisteredClaims: jwt.RegisteredClaims{
 					Issuer:    "bonxshop.com",
 					Subject:   "api-key",
@@ -131,17 +136,19 @@ func NewApiKey(secret string, expiredAt int64, claims *Claims) AuthFactory {
 }
 
 func ParseToken(secret string, tokenString string) (*AuthMapClaims, error) {
+	log.Printf("Parsing token: %s", tokenString) // เพิ่ม logging
 	token, err := jwt.ParseWithClaims(tokenString, &AuthMapClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("error: unexpected singing method")
+			return nil, errors.New("error: unexpected signing method")
 		}
 		return []byte(secret), nil
 	})
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenMalformed) {
+			log.Printf("Error: ParseToken: %s", err.Error())
 			return nil, errors.New("error: token format is invalid")
 		} else if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, errors.New(("error: token is expired"))
+			return nil, errors.New("error: token is expired")
 		} else {
 			return nil, errors.New("error: token is invalid")
 		}
@@ -149,7 +156,21 @@ func ParseToken(secret string, tokenString string) (*AuthMapClaims, error) {
 
 	if claims, ok := token.Claims.(*AuthMapClaims); ok {
 		return claims, nil
+	} else {
+		return nil, errors.New("error: claims type is invalid")
 	}
+}
 
-	return nil, errors.New(("error: claims type invalid"))
+// Apikey generator
+var apiKeyInstant string
+var one sync.Once
+
+func SetApiKey(secret string) {
+	one.Do(func() {
+		apiKeyInstant = NewApiKey(secret).SignToken()
+	})
+}
+
+func SetApiKeyInContext(pctx *context.Context) {
+	*pctx = metadata.NewOutgoingContext(*pctx, metadata.Pairs("auth", apiKeyInstant))
 }

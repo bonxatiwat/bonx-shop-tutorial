@@ -39,12 +39,12 @@ func (h *playerHttpHandler) CreatePlayer(c echo.Context) error {
 	req := new(player.CreatePlayerReq)
 
 	if err := wrapper.Bind(req); err != nil {
-		return response.ErrorRespose(c, http.StatusBadRequest, err.Error())
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	res, err := h.playerUsecase.CreatePlayer(ctx, req)
 	if err != nil {
-		return response.ErrorRespose(c, http.StatusBadRequest, err.Error())
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return response.SuccessResponse(c, http.StatusCreated, res)
@@ -57,7 +57,7 @@ func (h *playerHttpHandler) FindOnePlayerProfile(c echo.Context) error {
 
 	res, err := h.playerUsecase.FindOnePlayerProfile(ctx, playerId)
 	if err != nil {
-		return response.ErrorRespose(c, http.StatusBadRequest, err.Error())
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return response.SuccessResponse(c, http.StatusOK, res)
@@ -71,12 +71,12 @@ func (h *playerHttpHandler) AddPlayerMoney(c echo.Context) error {
 	req := new(player.CreatePlayerTransactionReq)
 
 	if err := wrapper.Bind(req); err != nil {
-		return response.ErrorRespose(c, http.StatusBadRequest, err.Error())
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	res, err := h.playerUsecase.AddPlayerMoney(ctx, req)
 	if err != nil {
-		return response.ErrorRespose(c, http.StatusBadRequest, err.Error())
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return response.SuccessResponse(c, http.StatusCreated, res)
@@ -88,7 +88,7 @@ func (h *playerHttpHandler) GetPlayerSavingAccount(c echo.Context) error {
 	playerId := c.Param("player_id")
 	res, err := h.playerUsecase.GetPlayerSavingAccount(ctx, playerId)
 	if err != nil {
-		return response.ErrorRespose(c, http.StatusBadRequest, err.Error())
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return response.SuccessResponse(c, http.StatusOK, res)

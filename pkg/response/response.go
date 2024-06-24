@@ -10,7 +10,7 @@ type (
 	}
 )
 
-func ErrorRespose(c echo.Context, statusCode int, message string) error {
+func ErrorResponse(c echo.Context, statusCode int, message string) error {
 	return c.JSON(statusCode, &MsgResponse{Message: message})
 }
 
