@@ -13,7 +13,7 @@ import (
 type (
 	MiddlewareRepositoryService interface {
 		AccessTokenSearch(pctx context.Context, grpcUrl, accessToken string) error
-		RoleCount(pctx context.Context, grpcUrl string) (int64, error)
+		RolesCount(pctx context.Context, grpcUrl string) (int64, error)
 	}
 
 	middlewareRepository struct{}
@@ -54,7 +54,7 @@ func (m *middlewareRepository) AccessTokenSearch(pctx context.Context, grpcUrl, 
 	return nil
 }
 
-func (r *middlewareRepository) RoleCount(pctx context.Context, grpcUrl string) (int64, error) {
+func (r *middlewareRepository) RolesCount(pctx context.Context, grpcUrl string) (int64, error) {
 	ctx, cancel := context.WithTimeout(pctx, 30*time.Second)
 	defer cancel()
 
@@ -71,8 +71,8 @@ func (r *middlewareRepository) RoleCount(pctx context.Context, grpcUrl string) (
 	}
 
 	if result == nil {
-		log.Printf("Error: access token is invalid")
-		return -1, errors.New("error: access token is invalid")
+		log.Printf("Error: roles count failed")
+		return -1, errors.New("error: roles count failed")
 	}
 
 	return result.Count, nil
