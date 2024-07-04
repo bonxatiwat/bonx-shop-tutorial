@@ -136,7 +136,6 @@ func NewApiKey(secret string) AuthFactory {
 }
 
 func ParseToken(secret string, tokenString string) (*AuthMapClaims, error) {
-	log.Printf("Parsing token: %s", tokenString) // เพิ่ม logging
 	token, err := jwt.ParseWithClaims(tokenString, &AuthMapClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("error: unexpected signing method")

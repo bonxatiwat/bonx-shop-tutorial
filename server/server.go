@@ -13,6 +13,7 @@ import (
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/middleware/middlewareHandler"
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/middleware/middlewareRepository"
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/middleware/middlewareUsecase"
+	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/jwtauth"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -59,6 +60,8 @@ func Start(ptcx context.Context, cfg *config.Config, db *mongo.Client) {
 		cfg:        cfg,
 		middleware: newMiddlerware(cfg),
 	}
+
+	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)
 
 	// Basic Middleware
 	// Request Timeout

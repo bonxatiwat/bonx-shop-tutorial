@@ -48,6 +48,7 @@ func (r *authRepository) CredentialSearch(pctx context.Context, grpcUrl string, 
 	ctx, cancel := context.WithTimeout(pctx, 30*time.Second)
 	defer cancel()
 
+	jwtauth.SetApiKeyInContext(&ctx)
 	conn, err := grpccon.NewGrpcClient(grpcUrl)
 	if err != nil {
 		log.Printf("Error: gRPC connection failed: %s", err.Error())
@@ -68,6 +69,7 @@ func (r *authRepository) FindOnePlayerProfileToRefresh(pctx context.Context, grp
 	ctx, cancel := context.WithTimeout(pctx, 30*time.Second)
 	defer cancel()
 
+	jwtauth.SetApiKeyInContext(&ctx)
 	conn, err := grpccon.NewGrpcClient(grpcUrl)
 	if err != nil {
 		log.Printf("Error: gRPC connection failed: %s", err.Error())
