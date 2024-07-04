@@ -68,7 +68,7 @@ func (r *playerRepository) InsertOnePlayer(pctx context.Context, req *player.Pla
 
 	playerId, err := col.InsertOne(ctx, req)
 	if err != nil {
-		log.Printf("Error: InsertOnPlayer: %s", err)
+		log.Printf("Error: InsertOnePlayer: %s", err)
 		return primitive.NilObjectID, errors.New("error: insert one player failed")
 	}
 

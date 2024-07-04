@@ -28,7 +28,7 @@ type (
 	}
 
 	CredentialRes struct {
-		Id           string    `json:"_id" `
+		Id           string    `json:"_id"`
 		PlayerId     string    `json:"player_id"`
 		RoleCode     int       `json:"role_code"`
 		AccessToken  string    `json:"access_token"`
