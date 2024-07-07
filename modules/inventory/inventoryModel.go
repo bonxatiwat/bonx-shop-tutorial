@@ -2,7 +2,6 @@ package inventory
 
 import (
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/item"
-	"github.com/bonxatiwat/bonx-shop-tutorial/modules/models"
 )
 
 type (
@@ -13,11 +12,7 @@ type (
 
 	ItemInventory struct {
 		IventoryId string `json:"inventory_id"`
+		PlayerId   string `json:"player_id"`
 		*item.ItemShowCase
-	}
-
-	PlayerInventory struct {
-		PlayerId string `json:"player_id"`
-		*models.PaginateRes
 	}
 )

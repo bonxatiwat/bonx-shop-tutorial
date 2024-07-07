@@ -120,5 +120,4 @@ func (h *itemHttpHandler) EnableOrDisableItem(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusOK, map[string]any{
 		"message": fmt.Sprintf("item_id: %s is successfully is activated to: %v", itemId, res),
 	})
-
 }
