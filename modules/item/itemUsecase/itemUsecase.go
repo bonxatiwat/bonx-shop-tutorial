@@ -83,6 +83,7 @@ func (u *itemUsecase) FindManyItems(pctx context.Context, basePaginateUrl string
 		req.Start = strings.TrimPrefix(req.Start, "item:")
 		findItemsFilter = append(findItemsFilter, bson.E{"_id", bson.D{{"$gt", utils.ConvertToObjectId(req.Start)}}})
 	}
+
 	if req.Title != "" {
 		findItemsFilter = append(findItemsFilter, bson.E{"title", primitive.Regex{Pattern: req.Title, Options: "i"}})
 		countItemsFilter = append(countItemsFilter, bson.E{"title", primitive.Regex{Pattern: req.Title, Options: "i"}})
@@ -191,6 +192,7 @@ func (u *itemUsecase) FindItemInIds(pctx context.Context, req *itemPb.FindItemsI
 	}
 
 	filter = append(filter, bson.E{"_id", bson.D{{"$in", objectIds}}})
+	filter = append(filter, bson.E{"usage_status", true})
 
 	results, err := u.itemRepository.FindManyItems(pctx, filter, nil)
 	if err != nil {

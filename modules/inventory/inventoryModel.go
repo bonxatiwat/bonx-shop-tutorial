@@ -2,6 +2,7 @@ package inventory
 
 import (
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/item"
+	"github.com/bonxatiwat/bonx-shop-tutorial/modules/models"
 )
 
 type (
@@ -10,9 +11,13 @@ type (
 		ItemId   string `json:"item_id" validate:"required,max=64"`
 	}
 
-	ItemInventory struct {
-		IventoryId string `json:"inventory_id"`
-		PlayerId   string `json:"player_id"`
+	ItemInInventory struct {
+		InventoryId string `json:"inventory_id"`
+		PlayerId    string `json:"player_id"`
 		*item.ItemShowCase
+	}
+
+	InventorySearchReq struct {
+		models.PaginateReq
 	}
 )
