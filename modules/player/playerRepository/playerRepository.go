@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/bonxatiwat/bonx-shop-tutorial/modules/models"
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/player"
 	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,6 +24,8 @@ type (
 		GetPlayerSavingAccount(pctx context.Context, playerId string) (*player.PlayerSavingAccount, error)
 		FindOnePlayerCredential(pctx context.Context, email string) (*player.Player, error)
 		FindOnePlayerProfileToRefresh(pctx context.Context, playerId string) (*player.Player, error)
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 	}
 
 	playerRepository struct {
@@ -36,6 +39,38 @@ func NewPlayerRepository(db *mongo.Client) PlayerRepositoryService {
 
 func (r *playerRepository) playerDbConn(pctx context.Context) *mongo.Database {
 	return r.db.Database("player_db")
+}
+
+func (r *playerRepository) GetOffset(pctx context.Context) (int64, error) {
+	ctx, cancel := context.WithTimeout(pctx, 10*time.Second)
+	defer cancel()
+
+	db := r.playerDbConn(ctx)
+	col := db.Collection("player_transactions_queue")
+
+	result := new(models.KafkaOffset)
+	if err := col.FindOne(ctx, bson.M{}).Decode(result); err != nil {
+		log.Printf("Error: GetOffset failed: %s", err.Error())
+		return -1, errors.New("error: GetOffset failed")
+	}
+	return result.Offset, nil
+}
+
+func (r *playerRepository) UpsertOffset(pctx context.Context, offset int64) error {
+	ctx, cancel := context.WithTimeout(pctx, 10*time.Second)
+	defer cancel()
+
+	db := r.playerDbConn(ctx)
+	col := db.Collection("player_transactions_queue")
+
+	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offet": offset}}, options.Update().SetUpsert(true))
+	if err != nil {
+		log.Printf("Error: UpserOffset failed: %s", err.Error())
+		return errors.New("error: UpserOffset failed")
+	}
+	log.Printf("Info: UpserOffset result: %v", result)
+
+	return nil
 }
 
 func (r *playerRepository) IsUniquePlayer(pctx context.Context, email, username string) bool {

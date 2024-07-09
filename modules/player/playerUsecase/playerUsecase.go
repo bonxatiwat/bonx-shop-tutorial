@@ -21,6 +21,8 @@ type (
 		GetPlayerSavingAccount(pctx context.Context, playerId string) (*player.PlayerSavingAccount, error)
 		FindOnePlayerCredential(pctx context.Context, password, email string) (*playerPb.PlayerProfile, error)
 		FindOnePlayerProfileToRefresh(pctx context.Context, playerId string) (*playerPb.PlayerProfile, error)
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 	}
 
 	playerUsecase struct {
@@ -30,6 +32,14 @@ type (
 
 func NewPlayerUsecase(playerRepository playerRepository.PlayerRepositoryService) PlayerUsecaseService {
 	return &playerUsecase{playerRepository: playerRepository}
+}
+
+func (u *playerUsecase) GetOffset(pctx context.Context) (int64, error) {
+	return u.playerRepository.GetOffset(pctx)
+}
+
+func (u *playerUsecase) UpsertOffset(pctx context.Context, offset int64) error {
+	return u.playerRepository.UpsertOffset(pctx, int64(offset))
 }
 
 func (u *playerUsecase) CreatePlayer(pctx context.Context, req *player.CreatePlayerReq) (*player.PlayerProfile, error) {

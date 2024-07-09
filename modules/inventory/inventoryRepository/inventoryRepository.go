@@ -8,6 +8,7 @@ import (
 
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/inventory"
 	itemPb "github.com/bonxatiwat/bonx-shop-tutorial/modules/item/itemPb"
+	"github.com/bonxatiwat/bonx-shop-tutorial/modules/models"
 	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/grpccon"
 	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/jwtauth"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,6 +22,8 @@ type (
 		FindItemsInIds(pctx context.Context, grpcUrl string, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error)
 		FindPlayerItems(pctx context.Context, filter primitive.D, opts []*options.FindOptions) ([]*inventory.Inventory, error)
 		CountPlayerItems(pctx context.Context, playerId string) (int64, error)
+		GetOffset(pctx context.Context) (int64, error)
+		UpsertOffset(pctx context.Context, offset int64) error
 	}
 
 	inventoryRepository struct {
@@ -34,6 +37,38 @@ func NewInventoryService(db *mongo.Client) InventoryRepositoryService {
 
 func (r *inventoryRepository) inventoryDbConn(ptcx context.Context) *mongo.Database {
 	return r.db.Database("inventory_db")
+}
+
+func (r *inventoryRepository) GetOffset(pctx context.Context) (int64, error) {
+	ctx, cancel := context.WithTimeout(pctx, 10*time.Second)
+	defer cancel()
+
+	db := r.inventoryDbConn(ctx)
+	col := db.Collection("players_inventory_queue")
+
+	result := new(models.KafkaOffset)
+	if err := col.FindOne(ctx, bson.M{}).Decode(result); err != nil {
+		log.Printf("Error: GetOffset failed: %s", err.Error())
+		return -1, errors.New("error: GetOffset failed")
+	}
+	return result.Offset, nil
+}
+
+func (r *inventoryRepository) UpsertOffset(pctx context.Context, offset int64) error {
+	ctx, cancel := context.WithTimeout(pctx, 10*time.Second)
+	defer cancel()
+
+	db := r.inventoryDbConn(ctx)
+	col := db.Collection("players_inventory_queue")
+
+	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offet": offset}}, options.Update().SetUpsert(true))
+	if err != nil {
+		log.Printf("Error: UpserOffset failed: %s", err.Error())
+		return errors.New("error: UpserOffset failed")
+	}
+	log.Printf("Info: UpserOffset result: %v", result)
+
+	return nil
 }
 
 func (r *inventoryRepository) FindItemsInIds(pctx context.Context, grpcUrl string, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error) {
