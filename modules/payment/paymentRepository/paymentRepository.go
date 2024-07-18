@@ -2,14 +2,18 @@ package paymentRepository
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"time"
 
+	"github.com/bonxatiwat/bonx-shop-tutorial/config"
 	itemPb "github.com/bonxatiwat/bonx-shop-tutorial/modules/item/itemPb"
 	"github.com/bonxatiwat/bonx-shop-tutorial/modules/models"
+	"github.com/bonxatiwat/bonx-shop-tutorial/modules/player"
 	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/grpccon"
 	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/jwtauth"
+	"github.com/bonxatiwat/bonx-shop-tutorial/pkg/queue"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,6 +24,8 @@ type (
 		FindItemsInIds(pctx context.Context, grpcUrl string, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error)
 		GetOffset(pctx context.Context) (int64, error)
 		UpsertOffset(pctx context.Context, offset int64) error
+		DockedPlayerMoney(pctx context.Context, cfg *config.Config, req *player.CreatePlayerTransactionReq) error
+		RollbackTransaction(pctx context.Context, cfg *config.Config, req *player.RollbackPlayerTransactionReq) error
 	}
 
 	paymentRepository struct {
@@ -28,7 +34,7 @@ type (
 )
 
 func NewPaymentRepository(db *mongo.Client) PaymentRepositoryService {
-	return &paymentRepository{db}
+	return &paymentRepository{db: db}
 }
 
 func (r *paymentRepository) paymentDbConn(ptcx context.Context) *mongo.Database {
@@ -57,7 +63,7 @@ func (r *paymentRepository) UpsertOffset(pctx context.Context, offset int64) err
 	db := r.paymentDbConn(ctx)
 	col := db.Collection("payment_queue")
 
-	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offet": offset}}, options.Update().SetUpsert(true))
+	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offset": offset}}, options.Update().SetUpsert(true))
 	if err != nil {
 		log.Printf("Error: UpserOffset failed: %s", err.Error())
 		return errors.New("error: UpserOffset failed")
@@ -96,4 +102,34 @@ func (r *paymentRepository) FindItemsInIds(pctx context.Context, grpcUrl string,
 
 	return result, nil
 
+}
+
+func (r *paymentRepository) DockedPlayerMoney(pctx context.Context, cfg *config.Config, req *player.CreatePlayerTransactionReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Error: DockedPlayerMoney failed: %s", err.Error())
+		return errors.New("error: docked player money failed")
+	}
+
+	if err := queue.PushMessageWithKeyToQueue([]string{cfg.Kafka.Url}, cfg.Kafka.ApiKey, cfg.Kafka.Secret, "player", "buy", reqInBytes); err != nil {
+		log.Printf("Error: DockedPlayerMoney failed: %s", err.Error())
+		return errors.New("error: docked player money failed")
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) RollbackTransaction(pctx context.Context, cfg *config.Config, req *player.RollbackPlayerTransactionReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Error: RollbackTransaction failed: %s", err.Error())
+		return errors.New("error: rollback docked player money")
+	}
+
+	if err := queue.PushMessageWithKeyToQueue([]string{cfg.Kafka.Url}, cfg.Kafka.ApiKey, cfg.Kafka.Secret, "player", "rtransaction", reqInBytes); err != nil {
+		log.Printf("Error: RollbackTransaction failed: %s", err.Error())
+		return errors.New("error: rollback docked player money failed")
+	}
+
+	return nil
 }

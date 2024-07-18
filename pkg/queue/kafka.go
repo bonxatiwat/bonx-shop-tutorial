@@ -10,7 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func ConenctProducer(brokerUrl []string, apiKey, secret string) (sarama.SyncProducer, error) {
+func ConnectProducer(brokerUrls []string, apiKey, secret string) (sarama.SyncProducer, error) {
 	config := sarama.NewConfig()
 	if apiKey != "" && secret != "" {
 		config.Net.SASL.Enable = true
@@ -24,26 +24,23 @@ func ConenctProducer(brokerUrl []string, apiKey, secret string) (sarama.SyncProd
 			InsecureSkipVerify: true,
 			ClientAuth:         tls.NoClientCert,
 		}
-
 	}
 	config.Producer.Return.Successes = true
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 3
 
-	producer, err := sarama.NewSyncProducer(brokerUrl, config)
-
+	producer, err := sarama.NewSyncProducer(brokerUrls, config)
 	if err != nil {
-		log.Printf("Error: Failed to connect producer: %s", err.Error())
+		log.Printf("Error: Failed to connect to producer: %s", err.Error())
 		return nil, errors.New("error: failed to connect to producer")
 	}
-
 	return producer, nil
 }
 
-func PushMessageWithKeyToQueue(brokerUrl []string, apiKey, secret, topic, key string, message []byte) error {
-	producer, err := ConenctProducer(brokerUrl, apiKey, secret)
+func PushMessageWithKeyToQueue(brokerUrls []string, apiKey, secret, topic, key string, message []byte) error {
+	producer, err := ConnectProducer(brokerUrls, apiKey, secret)
 	if err != nil {
-		log.Printf("Error: Failed to connect producer: %s", err.Error())
+		log.Printf("Error: Failed to connect to producer: %s", err.Error())
 		return errors.New("error: failed to connect to producer")
 	}
 	defer producer.Close()
@@ -64,7 +61,7 @@ func PushMessageWithKeyToQueue(brokerUrl []string, apiKey, secret, topic, key st
 	return nil
 }
 
-func ConnectConsumer(brokerUrl []string, apiKey, secret string) (sarama.Consumer, error) {
+func ConnectConsumer(brokerUrls []string, apiKey, secret string) (sarama.Consumer, error) {
 	config := sarama.NewConfig()
 	if apiKey != "" && secret != "" {
 		config.Net.SASL.Enable = true
@@ -78,13 +75,14 @@ func ConnectConsumer(brokerUrl []string, apiKey, secret string) (sarama.Consumer
 			InsecureSkipVerify: true,
 			ClientAuth:         tls.NoClientCert,
 		}
-
 	}
-	config.Producer.Return.Successes = true
-	config.Producer.Retry.Max = 3
+	config.Consumer.Return.Errors = true
+	config.Consumer.Fetch.Max = 3
 
-	consumer, err := sarama.NewConsumer(brokerUrl, config)
+	consumer, err := sarama.NewConsumer(brokerUrls, config)
 	if err != nil {
+		// log.Panicln("Error: brokerUrls: ", brokerUrls)
+		// log.Panicln("Error: brokerUrls: ", config)
 		log.Printf("Error: Failed to connect to consumer: %s", err.Error())
 		return nil, errors.New("error: failed to connect to consumer")
 	}

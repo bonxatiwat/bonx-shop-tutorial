@@ -31,7 +31,7 @@ type (
 )
 
 func NewItemRepository(db *mongo.Client) ItemRepositoryService {
-	return &itemRepository{db}
+	return &itemRepository{db: db}
 }
 
 func (r *itemRepository) itemDbConn(pctx context.Context) *mongo.Database {

@@ -32,7 +32,7 @@ type (
 )
 
 func NewInventoryService(db *mongo.Client) InventoryRepositoryService {
-	return &inventoryRepository{db}
+	return &inventoryRepository{db: db}
 }
 
 func (r *inventoryRepository) inventoryDbConn(ptcx context.Context) *mongo.Database {

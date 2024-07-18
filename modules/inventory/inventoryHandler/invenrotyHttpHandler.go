@@ -24,7 +24,7 @@ type (
 )
 
 func NewInvertoryHttpHandler(cfg *config.Config, inventoryUsecase inventoryUsecase.InventoryUsecaseService) InventoryHttpHandlerService {
-	return &inventoryHttpHandler{cfg, inventoryUsecase}
+	return &inventoryHttpHandler{cfg: cfg, inventoryUsecase: inventoryUsecase}
 }
 
 func (h *inventoryHttpHandler) FindPlayerItems(c echo.Context) error {

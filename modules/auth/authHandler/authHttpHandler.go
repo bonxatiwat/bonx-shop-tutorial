@@ -27,7 +27,7 @@ type (
 )
 
 func NewAuthHttpHandler(cfg *config.Config, authUsecase authUsecase.AuthUsecaseService) AuthHttpHandlerService {
-	return &authHttpHandler{cfg, authUsecase}
+	return &authHttpHandler{cfg: cfg, authUsecase: authUsecase}
 }
 
 func (h *authHttpHandler) Login(c echo.Context) error {

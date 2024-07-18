@@ -11,5 +11,5 @@ type (
 )
 
 func NewInvertoryQueueHandler(inventoryUsecase inventoryUsecase.InventoryUsecaseService) InventoryQueueHandlerService {
-	return &inventoryQueueHandler{inventoryUsecase}
+	return &inventoryQueueHandler{inventoryUsecase: inventoryUsecase}
 }

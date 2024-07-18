@@ -33,7 +33,7 @@ type (
 )
 
 func NewItemUsecase(itemRepository itemRepository.ItemRepositoryService) ItemUsecaseService {
-	return &itemUsecase{itemRepository}
+	return &itemUsecase{itemRepository: itemRepository}
 }
 
 func (u *itemUsecase) CreateItem(pctx context.Context, req *item.CreateItemReq) (*item.ItemShowCase, error) {

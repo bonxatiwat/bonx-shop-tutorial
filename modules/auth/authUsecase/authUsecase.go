@@ -32,7 +32,7 @@ type (
 )
 
 func NewAuthUsecase(authRepository authRepository.AuthRepositoryService) AuthUsecaseService {
-	return &authUsecase{authRepository}
+	return &authUsecase{authRepository: authRepository}
 }
 
 func (u *authUsecase) Login(pctx context.Context, cfg *config.Config, req *auth.PlayerLoginReq) (*auth.ProfileIntercepter, error) {

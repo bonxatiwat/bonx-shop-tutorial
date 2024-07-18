@@ -37,7 +37,7 @@ type (
 )
 
 func NewAuthRepository(db *mongo.Client) AuthRepositoryService {
-	return &authRepository{db}
+	return &authRepository{db: db}
 }
 
 func (r *authRepository) authDbConn(pctx context.Context) *mongo.Database {

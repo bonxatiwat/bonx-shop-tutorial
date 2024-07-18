@@ -28,7 +28,7 @@ type (
 )
 
 func NewInvertoryUsecase(inventoryRepository inventoryRepository.InventoryRepositoryService) InventoryUsecaseService {
-	return &inventoryUsecase{inventoryRepository}
+	return &inventoryUsecase{inventoryRepository: inventoryRepository}
 }
 
 func (u *inventoryUsecase) GetOffset(pctx context.Context) (int64, error) {

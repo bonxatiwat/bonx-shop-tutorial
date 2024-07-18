@@ -30,7 +30,7 @@ type (
 )
 
 func NewItemHttpHandler(cfg *config.Config, itemUsecase itemUsecase.ItemUsecaseService) ItemHttpHandlerService {
-	return &itemHttpHandler{cfg, itemUsecase}
+	return &itemHttpHandler{cfg: cfg, itemUsecase: itemUsecase}
 }
 
 func (h *itemHttpHandler) CreateItem(c echo.Context) error {
