@@ -42,9 +42,8 @@ func NewPlayerUsecase(playerRepository playerRepository.PlayerRepositoryService)
 func (u *playerUsecase) GetOffset(pctx context.Context) (int64, error) {
 	return u.playerRepository.GetOffset(pctx)
 }
-
 func (u *playerUsecase) UpsertOffset(pctx context.Context, offset int64) error {
-	return u.playerRepository.UpsertOffset(pctx, int64(offset))
+	return u.playerRepository.UpsertOffset(pctx, offset)
 }
 
 func (u *playerUsecase) CreatePlayer(pctx context.Context, req *player.CreatePlayerReq) (*player.PlayerProfile, error) {
@@ -61,17 +60,18 @@ func (u *playerUsecase) CreatePlayer(pctx context.Context, req *player.CreatePla
 	// Insert one player
 	playerId, err := u.playerRepository.InsertOnePlayer(pctx, &player.Player{
 		Email:     req.Email,
-		Username:  req.Username,
 		Password:  string(hashedPassword),
+		Username:  req.Username,
 		CreatedAt: utils.LocalTime(),
 		UpdatedAt: utils.LocalTime(),
 		PlayerRoles: []player.PlayerRole{
 			{
-				RoleTitle: "player",
+				RoleTitle: "Player",
 				RoleCode:  0,
 			},
 		},
 	})
+
 	return u.FindOnePlayerProfile(pctx, playerId.Hex())
 }
 
@@ -81,11 +81,7 @@ func (u *playerUsecase) FindOnePlayerProfile(pctx context.Context, playerId stri
 		return nil, err
 	}
 
-	loc, err := time.LoadLocation("Asia/Bangkok")
-	if err != nil {
-		log.Printf("Error: FindOnePlayerProfile: %s", err.Error())
-		return nil, errors.New("error: failed to load location")
-	}
+	loc, _ := time.LoadLocation("Asia/Bangkok")
 
 	return &player.PlayerProfile{
 		Id:        result.Id.Hex(),
@@ -97,6 +93,7 @@ func (u *playerUsecase) FindOnePlayerProfile(pctx context.Context, playerId stri
 }
 
 func (u *playerUsecase) AddPlayerMoney(pctx context.Context, req *player.CreatePlayerTransactionReq) (*player.PlayerSavingAccount, error) {
+	// Insert one player transaction
 	if _, err := u.playerRepository.InsertOnePlayerTransaction(pctx, &player.PlayerTransaction{
 		PlayerId:  req.PlayerId,
 		Amount:    req.Amount,
@@ -121,19 +118,15 @@ func (u *playerUsecase) FindOnePlayerCredential(pctx context.Context, password, 
 
 	if err := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(password)); err != nil {
 		log.Printf("Error: FindOnePlayerCredential: %s", err.Error())
-		return nil, errors.New("error: email is invalid")
-	}
-
-	loc, _ := time.LoadLocation("Asia/Bangkok")
-	if err != nil {
-		log.Printf("Error: FindOnePlayerProfile: %s", err.Error())
-		return nil, errors.New("error: failed to load location")
+		return nil, errors.New("error: password is invalid")
 	}
 
 	roleCode := 0
 	for _, v := range result.PlayerRoles {
 		roleCode += v.RoleCode
 	}
+
+	loc, _ := time.LoadLocation("Asia/Bangkok")
 
 	return &playerPb.PlayerProfile{
 		Id:        result.Id.Hex(),

@@ -19,15 +19,16 @@ func AuthMigrate(pctx context.Context, cfg *config.Config) {
 	db := authDbConn(pctx, cfg)
 	defer db.Client().Disconnect(pctx)
 
-	// auth
 	col := db.Collection("auth")
 
+	// indexs
+
+	// auth
 	indexs, _ := col.Indexes().CreateMany(pctx, []mongo.IndexModel{
 		{Keys: bson.D{{"_id", 1}}},
 		{Keys: bson.D{{"player_id", 1}}},
 		{Keys: bson.D{{"refresh_token", 1}}},
 	})
-
 	for _, index := range indexs {
 		log.Printf("Index: %s", index)
 	}
@@ -39,7 +40,6 @@ func AuthMigrate(pctx context.Context, cfg *config.Config) {
 		{Keys: bson.D{{"_id", 1}}},
 		{Keys: bson.D{{"code", 1}}},
 	})
-
 	for _, index := range indexs {
 		log.Printf("Index: %s", index)
 	}
@@ -69,5 +69,4 @@ func AuthMigrate(pctx context.Context, cfg *config.Config) {
 		panic(err)
 	}
 	log.Println("Migrate auth completed: ", results)
-
 }

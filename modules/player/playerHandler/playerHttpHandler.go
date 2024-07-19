@@ -87,6 +87,7 @@ func (h *playerHttpHandler) GetPlayerSavingAccount(c echo.Context) error {
 	ctx := context.Background()
 
 	playerId := c.Get("player_id").(string)
+
 	res, err := h.playerUsecase.GetPlayerSavingAccount(ctx, playerId)
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())

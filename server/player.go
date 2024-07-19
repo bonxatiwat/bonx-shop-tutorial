@@ -18,7 +18,7 @@ func (s *server) playerService() {
 	queueHandler := playerHandler.NewPlayerQueueHandler(s.cfg, usecase)
 
 	go queueHandler.DockedPlayerMoney()
-	// go queueHandler.RollbackPlayerTransaction()
+	go queueHandler.RollbackPlayerTransaction()
 
 	// gRPC
 	go func() {
@@ -26,7 +26,7 @@ func (s *server) playerService() {
 
 		playerPb.RegisterPlayerGrpcServiceServer(grpcServer, grpcHandler)
 
-		log.Printf("Item gRPC server listening on %s", s.cfg.Grpc.PlayerUrl)
+		log.Printf("Player gRPC server listening on %s", s.cfg.Grpc.PlayerUrl)
 		grpcServer.Serve(lis)
 	}()
 

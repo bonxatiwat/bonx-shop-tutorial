@@ -59,6 +59,7 @@ func (r *playerRepository) GetOffset(pctx context.Context) (int64, error) {
 		log.Printf("Error: GetOffset failed: %s", err.Error())
 		return -1, errors.New("error: GetOffset failed")
 	}
+
 	return result.Offset, nil
 }
 
@@ -69,7 +70,7 @@ func (r *playerRepository) UpsertOffset(pctx context.Context, offset int64) erro
 	db := r.playerDbConn(ctx)
 	col := db.Collection("player_transactions_queue")
 
-	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offet": offset}}, options.Update().SetUpsert(true))
+	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offset": offset}}, options.Update().SetUpsert(true))
 	if err != nil {
 		log.Printf("Error: UpserOffset failed: %s", err.Error())
 		return errors.New("error: UpserOffset failed")
@@ -109,7 +110,7 @@ func (r *playerRepository) InsertOnePlayer(pctx context.Context, req *player.Pla
 
 	playerId, err := col.InsertOne(ctx, req)
 	if err != nil {
-		log.Printf("Error: InsertOnePlayer: %s", err)
+		log.Printf("Error: InsertOnePlayer: %s", err.Error())
 		return primitive.NilObjectID, errors.New("error: insert one player failed")
 	}
 
@@ -121,11 +122,11 @@ func (r *playerRepository) DeleteOnePlayerTransaction(pctx context.Context, tran
 	defer cancel()
 
 	db := r.playerDbConn(ctx)
-	col := db.Collection("players")
+	col := db.Collection("player_transactions")
 
 	result, err := col.DeleteOne(ctx, bson.M{"_id": utils.ConvertToObjectId(transactionId)})
 	if err != nil {
-		log.Printf("Error: DeleteOnePlayerTransaction failed: %s", err.Error())
+		log.Printf("Error: DeleteOnePlayerTransaction: %s", err.Error())
 		return errors.New("error: delete one player transaction failed")
 	}
 	log.Printf("Delete result: %v", result)
@@ -160,7 +161,6 @@ func (r *playerRepository) FindOnePlayerProfile(pctx context.Context, playerId s
 	}
 
 	return result, nil
-
 }
 
 func (r *playerRepository) InsertOnePlayerTransaction(pctx context.Context, req *player.PlayerTransaction) (primitive.ObjectID, error) {
@@ -170,12 +170,11 @@ func (r *playerRepository) InsertOnePlayerTransaction(pctx context.Context, req 
 	db := r.playerDbConn(ctx)
 	col := db.Collection("player_transactions")
 
-	result, err := col.InsertOne(pctx, req)
+	result, err := col.InsertOne(ctx, req)
 	if err != nil {
 		log.Printf("Error: InsertOnePlayerTransaction: %s", err.Error())
 		return primitive.NilObjectID, errors.New("error: insert one player transaction failed")
 	}
-
 	log.Printf("Result: InsertOnePlayerTransaction: %v", result.InsertedID)
 
 	return result.InsertedID.(primitive.ObjectID), nil
@@ -211,11 +210,11 @@ func (r *playerRepository) GetPlayerSavingAccount(pctx context.Context, playerId
 
 	cursors, err := col.Aggregate(ctx, filter)
 	if err != nil {
+		log.Printf("Error: GetPlayerSavingAccount: %s", err.Error())
 		return nil, errors.New("error: failed to get player saving account")
 	}
 
 	result := new(player.PlayerSavingAccount)
-
 	for cursors.Next(ctx) {
 		if err := cursors.Decode(result); err != nil {
 			log.Printf("Error: GetPlayerSavingAccount: %s", err.Error())
@@ -267,8 +266,15 @@ func (r *playerRepository) DockedPlayerMoneyRes(pctx context.Context, cfg *confi
 		return errors.New("error: docked player money res failed")
 	}
 
-	if err := queue.PushMessageWithKeyToQueue([]string{cfg.Kafka.Url}, cfg.Kafka.ApiKey, cfg.Kafka.Secret, "payment", "buy", reqInBytes); err != nil {
-		log.Printf("Error: DockedPlayerMoneyRes failed")
+	if err := queue.PushMessageWithKeyToQueue(
+		[]string{cfg.Kafka.Url},
+		cfg.Kafka.ApiKey,
+		cfg.Kafka.Secret,
+		"payment",
+		"buy",
+		reqInBytes,
+	); err != nil {
+		log.Printf("Error: DockedPlayerMoneyRes failed: %s", err.Error())
 		return errors.New("error: docked player money res failed")
 	}
 

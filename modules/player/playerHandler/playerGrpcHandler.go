@@ -15,7 +15,9 @@ type (
 )
 
 func NewPlayerGrpcHandler(playerUsecase playerUsecase.PlayerUsecaseService) *playerGrpcHandler {
-	return &playerGrpcHandler{playerUsecase: playerUsecase}
+	return &playerGrpcHandler{
+		playerUsecase: playerUsecase,
+	}
 }
 
 func (g *playerGrpcHandler) CredentialSearch(ctx context.Context, req *playerPb.CredentialSearchReq) (*playerPb.PlayerProfile, error) {

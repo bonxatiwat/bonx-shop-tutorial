@@ -81,8 +81,6 @@ func ConnectConsumer(brokerUrls []string, apiKey, secret string) (sarama.Consume
 
 	consumer, err := sarama.NewConsumer(brokerUrls, config)
 	if err != nil {
-		// log.Panicln("Error: brokerUrls: ", brokerUrls)
-		// log.Panicln("Error: brokerUrls: ", config)
 		log.Printf("Error: Failed to connect to consumer: %s", err.Error())
 		return nil, errors.New("error: failed to connect to consumer")
 	}

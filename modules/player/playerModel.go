@@ -12,7 +12,7 @@ type (
 	}
 
 	PlayerClaims struct {
-		Id       string `json:"_id"`
+		Id       string `json:"id"`
 		RoleCode int    `json:"role_code"`
 	}
 

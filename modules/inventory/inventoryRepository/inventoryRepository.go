@@ -61,7 +61,7 @@ func (r *inventoryRepository) UpsertOffset(pctx context.Context, offset int64) e
 	db := r.inventoryDbConn(ctx)
 	col := db.Collection("players_inventory_queue")
 
-	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offet": offset}}, options.Update().SetUpsert(true))
+	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offset": offset}}, options.Update().SetUpsert(true))
 	if err != nil {
 		log.Printf("Error: UpserOffset failed: %s", err.Error())
 		return errors.New("error: UpserOffset failed")

@@ -17,12 +17,12 @@ func inventoryDbConn(pctx context.Context, cfg *config.Config) *mongo.Database {
 func InventoryMigrate(pctx context.Context, cfg *config.Config) {
 	db := inventoryDbConn(pctx, cfg)
 	defer db.Client().Disconnect(pctx)
+
 	col := db.Collection("players_inventory")
 
 	indexs, _ := col.Indexes().CreateMany(pctx, []mongo.IndexModel{
 		{Keys: bson.D{{"player_id", 1}, {"item_id", 1}}},
 	})
-
 	for _, index := range indexs {
 		log.Printf("Index: %s", index)
 	}
@@ -34,5 +34,4 @@ func InventoryMigrate(pctx context.Context, cfg *config.Config) {
 		panic(err)
 	}
 	log.Println("Migrate inventory completed: ", results)
-
 }

@@ -110,13 +110,14 @@ func (h *playerQueueHandler) RollbackPlayerTransaction() {
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+
 	for {
 		select {
 		case err := <-consumer.Errors():
 			log.Println("Error: RollbackPlayerTransaction failed: ", err.Error())
 			continue
 		case msg := <-consumer.Messages():
-			if string(msg.Key) == "rtransction" {
+			if string(msg.Key) == "rtransaction" {
 				h.playerUsecase.UpsertOffset(ctx, msg.Offset+1)
 
 				req := new(player.RollbackPlayerTransactionReq)
@@ -127,10 +128,10 @@ func (h *playerQueueHandler) RollbackPlayerTransaction() {
 
 				h.playerUsecase.RollbackPlayerTransaction(ctx, req)
 
-				log.Printf("DockedPlayMoney | Topic(%s)| Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+				log.Printf("RollbackPlayerTransaction | Topic(%s)| Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
 			}
 		case <-sigchan:
-			log.Printf("Stop DockedPlayerMoney...")
+			log.Println("Stop RollbackPlayerTransaction...")
 			return
 		}
 	}
