@@ -40,7 +40,6 @@ type (
 func (a *authConcrete) SignToken() string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, a.Claims)
 	ss, _ := token.SignedString(a.Secret)
-	log.Printf("Generated token: %s", ss) // เพิ่ม logging
 	return ss
 }
 

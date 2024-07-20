@@ -10,7 +10,7 @@ message AccessTokenSearchReq {
 }
 
 message AccessTokenSearchRes {
-  bool isVaild = 1;
+  bool isValid = 1;
 }
 
 message RolesCountReq {}

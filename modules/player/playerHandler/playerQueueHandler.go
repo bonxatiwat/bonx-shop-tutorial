@@ -49,7 +49,7 @@ func (h *playerQueueHandler) PlayerConsumer(pctx context.Context) (sarama.Partit
 		log.Println("Trying to set offset as 0")
 		consumer, err = worker.ConsumePartition("player", 0, 0)
 		if err != nil {
-			log.Println("Error: PlayerConsumer failed: ", err.Error())
+			log.Println("Error: PaymentConsumer failed: ", err.Error())
 			return nil, err
 		}
 	}

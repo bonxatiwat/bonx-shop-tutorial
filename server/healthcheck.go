@@ -9,12 +9,12 @@ import (
 
 type healthCheck struct {
 	App    string `json:"app"`
-	Stauts string `json:"status"`
+	Status string `json:"status"`
 }
 
 func (s *server) healthCheckService(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusOK, &healthCheck{
 		App:    s.cfg.App.Name,
-		Stauts: "OK",
+		Status: "OK",
 	})
 }

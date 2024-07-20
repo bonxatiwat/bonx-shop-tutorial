@@ -17,7 +17,7 @@ message Item {
   string id = 1;
   string title = 2;
   double price = 3;
-  string image_url = 4;
+  string imageUrl = 4;
   int32 damage = 5;
 }
 

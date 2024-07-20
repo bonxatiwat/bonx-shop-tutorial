@@ -48,7 +48,7 @@ func (m *middlewareRepository) AccessTokenSearch(pctx context.Context, grpcUrl, 
 		return errors.New("error: access token is invalid")
 	}
 
-	if !result.IsVaild {
+	if !result.IsValid {
 		log.Printf("Error: access token is invalid")
 		return errors.New("error: access token is invalid")
 	}

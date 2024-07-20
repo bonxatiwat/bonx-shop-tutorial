@@ -28,18 +28,19 @@ type (
 	}
 )
 
-func newMiddlerware(cfg *config.Config) middlewareHandler.MiddlewareHandlerService {
+func newMiddleware(cfg *config.Config) middlewareHandler.MiddlewareHandlerService {
 	repo := middlewareRepository.NewMiddlewareRepository()
 	usecase := middlewareUsecase.NewMiddlewareUsecase(repo)
 	return middlewareHandler.NewMiddlewareHandler(cfg, usecase)
 }
 
-func (s *server) gracefulShutdown(ptcx context.Context, quit <-chan os.Signal) {
+func (s *server) gracefulShutdown(pctx context.Context, quit <-chan os.Signal) {
 	log.Printf("Start service: %s", s.cfg.App.Name)
-	<-quit
-	log.Printf("Shuting down service: %s", s.cfg.App.Name)
 
-	ctx, cancel := context.WithTimeout(ptcx, 10*time.Second)
+	<-quit
+	log.Printf("Shutting down service: %s", s.cfg.App.Name)
+
+	ctx, cancel := context.WithTimeout(pctx, 10*time.Second)
 	defer cancel()
 
 	if err := s.app.Shutdown(ctx); err != nil {
@@ -53,26 +54,25 @@ func (s *server) httpListening() {
 	}
 }
 
-func Start(ptcx context.Context, cfg *config.Config, db *mongo.Client) {
+func Start(pctx context.Context, cfg *config.Config, db *mongo.Client) {
 	s := &server{
 		app:        echo.New(),
 		db:         db,
 		cfg:        cfg,
-		middleware: newMiddlerware(cfg),
+		middleware: newMiddleware(cfg),
 	}
 
 	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)
 
 	// Basic Middleware
 	// Request Timeout
-
 	s.app.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
 		Skipper:      middleware.DefaultSkipper,
 		ErrorMessage: "Error: Request Timeout",
-		Timeout:      20 * time.Second,
+		Timeout:      30 * time.Second,
 	}))
 
-	// Cors
+	// CORS
 	s.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Skipper:      middleware.DefaultSkipper,
 		AllowOrigins: []string{"*"},
@@ -101,7 +101,7 @@ func Start(ptcx context.Context, cfg *config.Config, db *mongo.Client) {
 
 	s.app.Use(middleware.Logger())
 
-	go s.gracefulShutdown(ptcx, quit)
+	go s.gracefulShutdown(pctx, quit)
 
 	// Listening
 	s.httpListening()

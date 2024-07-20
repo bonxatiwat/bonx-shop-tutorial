@@ -28,7 +28,7 @@ type (
 )
 
 func NewPlayerHttpHandler(cfg *config.Config, playerUsecase playerUsecase.PlayerUsecaseService) PlayerHttpHandlerService {
-	return &playerHttpHandler{cfg: cfg, playerUsecase: playerUsecase}
+	return &playerHttpHandler{playerUsecase: playerUsecase}
 }
 
 func (h *playerHttpHandler) CreatePlayer(c echo.Context) error {

@@ -72,10 +72,10 @@ func (r *playerRepository) UpsertOffset(pctx context.Context, offset int64) erro
 
 	result, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offset": offset}}, options.Update().SetUpsert(true))
 	if err != nil {
-		log.Printf("Error: UpserOffset failed: %s", err.Error())
-		return errors.New("error: UpserOffset failed")
+		log.Printf("Error: UpsertOffset failed: %s", err.Error())
+		return errors.New("error: UpsertOffset failed")
 	}
-	log.Printf("Info: UpserOffset result: %v", result)
+	log.Printf("Info: UpsertOffset result: %v", result)
 
 	return nil
 }

@@ -161,18 +161,18 @@ func (u *authUsecase) AccessTokenSearch(pctx context.Context, accessToken string
 	credential, err := u.authRepository.FindOneAccessToken(pctx, accessToken)
 	if err != nil {
 		return &authPb.AccessTokenSearchRes{
-			IsVaild: false,
+			IsValid: false,
 		}, err
 	}
 
 	if credential == nil {
 		return &authPb.AccessTokenSearchRes{
-			IsVaild: false,
+			IsValid: false,
 		}, errors.New("error: access token is invalid")
 	}
 
 	return &authPb.AccessTokenSearchRes{
-		IsVaild: true,
+		IsValid: true,
 	}, nil
 }
 

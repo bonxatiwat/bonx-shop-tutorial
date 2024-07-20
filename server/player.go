@@ -18,7 +18,7 @@ func (s *server) playerService() {
 	queueHandler := playerHandler.NewPlayerQueueHandler(s.cfg, usecase)
 
 	go queueHandler.DockedPlayerMoney()
-	go queueHandler.RollbackPlayerTransaction()
+	// go queueHandler.RollbackPlayerTransaction()
 
 	// gRPC
 	go func() {

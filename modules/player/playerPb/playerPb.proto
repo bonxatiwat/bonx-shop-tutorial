@@ -29,7 +29,7 @@ message GetPlayerSavingAccountReq {
 
 message GetPlayerSavingAccountRes {
   string playerId = 1;
-  double balnace = 2;
+  double balance = 2;
 }
 
 // Methods

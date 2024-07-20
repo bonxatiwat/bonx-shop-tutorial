@@ -31,7 +31,7 @@ type (
 	}
 )
 
-func NewInventoryService(db *mongo.Client) InventoryRepositoryService {
+func NewInventoryRepository(db *mongo.Client) InventoryRepositoryService {
 	return &inventoryRepository{db: db}
 }
 

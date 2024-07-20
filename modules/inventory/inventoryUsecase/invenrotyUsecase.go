@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func NewInvertoryUsecase(inventoryRepository inventoryRepository.InventoryRepositoryService) InventoryUsecaseService {
+func NewInventoryUsecase(inventoryRepository inventoryRepository.InventoryRepositoryService) InventoryUsecaseService {
 	return &inventoryUsecase{inventoryRepository: inventoryRepository}
 }
 
@@ -66,7 +66,7 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, cfg *config.Con
 			Total: 0,
 			Limit: req.Limit,
 			First: models.FirstPaginate{
-				Href: fmt.Sprintf("%s/%s?limit=%d", cfg.Paginate.ItemNexPageBasesUrl, playerId, req.Limit),
+				Href: fmt.Sprintf("%s/%s?limit=%d", cfg.Paginate.ItemNextPageBasedUrl, playerId, req.Limit),
 			},
 			Next: models.NextPaginate{
 				Start: "",
@@ -122,11 +122,11 @@ func (u *inventoryUsecase) FindPlayerItems(pctx context.Context, cfg *config.Con
 		Total: total,
 		Limit: req.Limit,
 		First: models.FirstPaginate{
-			Href: fmt.Sprintf("%s/%s?limit=%d", cfg.Paginate.ItemNexPageBasesUrl, playerId, req.Limit),
+			Href: fmt.Sprintf("%s/%s?limit=%d", cfg.Paginate.ItemNextPageBasedUrl, playerId, req.Limit),
 		},
 		Next: models.NextPaginate{
 			Start: results[len(results)-1].InventoryId,
-			Href:  fmt.Sprintf("%s/%s?limit=%d&start=%s", cfg.Paginate.ItemNexPageBasesUrl, playerId, req.Limit, results[len(results)-1].ItemId),
+			Href:  fmt.Sprintf("%s/%s?limit=%d&start=%s", cfg.Paginate.ItemNextPageBasedUrl, playerId, req.Limit, results[len(results)-1].ItemId),
 		},
 	}, nil
 }

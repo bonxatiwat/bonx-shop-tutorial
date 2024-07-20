@@ -10,6 +10,6 @@ type (
 	}
 )
 
-func NewInvertoryQueueHandler(inventoryUsecase inventoryUsecase.InventoryUsecaseService) InventoryQueueHandlerService {
+func NewInventoryQueueHandler(inventoryUsecase inventoryUsecase.InventoryUsecaseService) InventoryQueueHandlerService {
 	return &inventoryQueueHandler{inventoryUsecase: inventoryUsecase}
 }

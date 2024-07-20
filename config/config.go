@@ -21,7 +21,7 @@ type (
 	App struct {
 		Name  string
 		Url   string
-		State string
+		Stage string
 	}
 
 	Db struct {
@@ -52,7 +52,7 @@ type (
 	}
 
 	Paginate struct {
-		ItemNexPageBasesUrl       string
+		ItemNextPageBasedUrl      string
 		InventoryNextPageBasedUrl string
 	}
 )
@@ -66,7 +66,7 @@ func LoadConfig(path string) Config {
 		App: App{
 			Name:  os.Getenv("APP_NAME"),
 			Url:   os.Getenv("APP_URL"),
-			State: os.Getenv("APP_STAGE"),
+			Stage: os.Getenv("APP_STAGE"),
 		},
 		Db: Db{
 			Url: os.Getenv("DB_URL"),
@@ -93,7 +93,7 @@ func LoadConfig(path string) Config {
 		Kafka: Kafka{
 			Url:    os.Getenv("KAFKA_URL"),
 			ApiKey: os.Getenv("KAFKA_API_KEY"),
-			Secret: os.Getenv("KAFKA_API_SECRET"),
+			Secret: os.Getenv("KAFKA_SECRET"),
 		},
 		Grpc: Grpc{
 			AuthUrl:      os.Getenv("GRPC_AUTH_URL"),
@@ -103,7 +103,7 @@ func LoadConfig(path string) Config {
 			PaymentUrl:   os.Getenv("GRPC_PAYMENT_URL"),
 		},
 		Paginate: Paginate{
-			ItemNexPageBasesUrl:       os.Getenv("PAGINATE_ITEM_NEXT_PAGE_BASED_URL"),
+			ItemNextPageBasedUrl:      os.Getenv("PAGINATE_ITEM_NEXT_PAGE_BASED_URL"),
 			InventoryNextPageBasedUrl: os.Getenv("PAGINATE_INVENTORY_NEXT_PAGE_BASED_URL"),
 		},
 	}
