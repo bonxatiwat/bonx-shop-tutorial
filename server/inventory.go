@@ -10,9 +10,11 @@ func (s *server) inventoryService() {
 	repo := inventoryRepository.NewInventoryRepository(s.db)
 	usecase := inventoryUsecase.NewInventoryUsecase(repo)
 	httpHandler := inventoryHandler.NewInventoryHttpHandler(s.cfg, usecase)
-	queueHandler := inventoryHandler.NewInventoryQueueHandler(usecase)
+	queueHandler := inventoryHandler.NewInventoryQueueHandler(s.cfg, usecase)
 
-	_ = queueHandler
+	go queueHandler.AddPlayerItem()
+	go queueHandler.RollbackAddPlayerItem()
+
 	inventory := s.app.Group("/inventory_v1")
 
 	// Health Check
