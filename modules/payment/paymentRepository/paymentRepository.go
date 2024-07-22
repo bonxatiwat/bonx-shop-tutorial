@@ -26,6 +26,7 @@ type (
 		GetOffset(pctx context.Context) (int64, error)
 		UpsertOffset(pctx context.Context, offset int64) error
 		DockedPlayerMoney(pctx context.Context, cfg *config.Config, req *player.CreatePlayerTransactionReq) error
+		AddPlayerMoney(pctx context.Context, cfg *config.Config, req *player.CreatePlayerTransactionReq) error
 		RollbackTransaction(pctx context.Context, cfg *config.Config, req *player.RollbackPlayerTransactionReq) error
 		AddPlayerItem(pctx context.Context, cfg *config.Config, req *inventory.UpdateInventoryReq) error
 		RemovePlayerItem(pctx context.Context, cfg *config.Config, req *inventory.UpdateInventoryReq) error
@@ -119,6 +120,21 @@ func (r *paymentRepository) DockedPlayerMoney(pctx context.Context, cfg *config.
 	if err := queue.PushMessageWithKeyToQueue([]string{cfg.Kafka.Url}, cfg.Kafka.ApiKey, cfg.Kafka.Secret, "player", "buy", reqInBytes); err != nil {
 		log.Printf("Error: DockedPlayerMoney failed: %s", err.Error())
 		return errors.New("error: docked player money failed")
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) AddPlayerMoney(pctx context.Context, cfg *config.Config, req *player.CreatePlayerTransactionReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Error: AddPlayerMoney failed: %s", err.Error())
+		return errors.New("error: add player money failed")
+	}
+
+	if err := queue.PushMessageWithKeyToQueue([]string{cfg.Kafka.Url}, cfg.Kafka.ApiKey, cfg.Kafka.Secret, "player", "sell", reqInBytes); err != nil {
+		log.Printf("Error: AddPlayerMoney failed: %s", err.Error())
+		return errors.New("error: add player money failed")
 	}
 
 	return nil
