@@ -20,7 +20,6 @@ type (
 		RemovePlayerItem()
 		RollbackAddPlayerItem()
 		RollbackRemovePlayerItem()
-		InventoryConsumer(pctx context.Context) (sarama.PartitionConsumer, error)
 	}
 
 	inventoryQueueHandler struct {
@@ -99,7 +98,88 @@ func (h *inventoryQueueHandler) AddPlayerItem() {
 		}
 	}
 }
+
 func (h *inventoryQueueHandler) RollbackAddPlayerItem() {
+	ctx := context.Background()
+
+	consumer, err := h.InventoryConsumer(ctx)
+	if err != nil {
+		return
+	}
+	defer consumer.Close()
+
+	log.Println("Start RollbackRemovePlayerItem ...")
+
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+
+	for {
+		select {
+		case err := <-consumer.Errors():
+			log.Println("Error: RollbackRemovePlayerItem failed: ", err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "radd" {
+				h.inventoryUsecase.UpsertOffset(ctx, msg.Offset+1)
+
+				req := new(inventory.RollbackPlayerInventoryReq)
+
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					continue
+				}
+
+				h.inventoryUsecase.RollbackRemovePlayerItem(ctx, h.cfg, req)
+
+				log.Printf("RollbackRemovePlayerItem | Topic(%s)| Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		case <-sigchan:
+			log.Println("Stop DockedPlayerMoney...")
+			return
+		}
+	}
+}
+
+func (h *inventoryQueueHandler) RemovePlayerItem() {
+	ctx := context.Background()
+
+	consumer, err := h.InventoryConsumer(ctx)
+	if err != nil {
+		return
+	}
+	defer consumer.Close()
+
+	log.Println("Start RemovePlayerItem ...")
+
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+
+	for {
+		select {
+		case err := <-consumer.Errors():
+			log.Println("Error: RemovePlayerItem failed: ", err.Error())
+			continue
+		case msg := <-consumer.Messages():
+			if string(msg.Key) == "sell" {
+				h.inventoryUsecase.UpsertOffset(ctx, msg.Offset+1)
+
+				req := new(inventory.UpdateInventoryReq)
+
+				if err := queue.DecodeMessage(req, msg.Value); err != nil {
+					continue
+				}
+
+				h.inventoryUsecase.RemovePlayerItemRes(ctx, h.cfg, req)
+
+				log.Printf("RemovePlayerItem | Topic(%s)| Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
+			}
+		case <-sigchan:
+			log.Println("Stop DockedPlayerMoney...")
+			return
+		}
+	}
+}
+
+func (h *inventoryQueueHandler) RollbackRemovePlayerItem() {
 	ctx := context.Background()
 
 	consumer, err := h.InventoryConsumer(ctx)
@@ -119,7 +199,7 @@ func (h *inventoryQueueHandler) RollbackAddPlayerItem() {
 			log.Println("Error: RollbackAddPlayerItem failed: ", err.Error())
 			continue
 		case msg := <-consumer.Messages():
-			if string(msg.Key) == "radd" {
+			if string(msg.Key) == "rremove" {
 				h.inventoryUsecase.UpsertOffset(ctx, msg.Offset+1)
 
 				req := new(inventory.RollbackPlayerInventoryReq)
@@ -138,5 +218,3 @@ func (h *inventoryQueueHandler) RollbackAddPlayerItem() {
 		}
 	}
 }
-func (h *inventoryQueueHandler) RemovePlayerItem()         {}
-func (h *inventoryQueueHandler) RollbackRemovePlayerItem() {}
